@@ -1,11 +1,8 @@
-import distribute_setup
-distribute_setup.use_setuptools()
-
-from setuptools import setup
+from distutils.core import setup
 
 setup(
     name='squarify',
-    version='0.1.2',
+    version='0.1.3',
     packages=['squarify'],
     author='Uri Laserson',
     author_email='uri.laserson@gmail.com',
