@@ -1,4 +1,4 @@
-squaripy
+squarify
 ========
 
 Pure Python implementation of squarify treemap layout algorithm.
