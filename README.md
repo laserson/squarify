@@ -1,7 +1,7 @@
 squarify
 ========
 
-Pure Python implementation of squarify treemap layout algorithm.
+Pure Python implementation of the squarify treemap layout algorithm.
 
 Based on algorithm from Bruls, Huizing, van Wijk, "Squarified Treemaps", but
 implements it differently.
@@ -40,10 +40,10 @@ to the corresponding value.  Here's an example rectangle:
 
 ```json
 {
-    'x': 0.0,
-    'y': 0.0,
-    'dx': 327.7,
-    'dy': 433.0
+    "x": 0.0,
+    "y": 0.0,
+    "dx": 327.7,
+    "dy": 433.0
 }
 ```
 
@@ -78,30 +78,50 @@ values = squarify.normalize_sizes(values, width, height)
 
 # returns a list of rectangles
 rects = squarify.squarify(values, x, y, width, height)
+
+# padded rectangles will probably visualize better for certain cases
+padded_rects = squarify.padded_squarify(values, x, y, width, height)
 ```
 
 The variable `rects` contains
 
 ```json
-[{'dx': 327.7153558052434, 'dy': 433.0, 'x': 0.0, 'y': 0.0},
- {'dx': 372.2846441947566,
-  'dy': 330.0862676056338,
-  'x': 327.7153558052434,
-  'y': 0.0},
- {'dx': 215.0977944236371,
-  'dy': 102.9137323943662,
-  'x': 327.7153558052434,
-  'y': 330.0862676056338},
- {'dx': 68.94160077680677,
-  'dy': 102.9137323943662,
-  'x': 542.8131502288805,
-  'y': 330.0862676056338},
- {'dx': 88.24524899431273,
-  'dy': 80.40135343309854,
-  'x': 611.7547510056874,
-  'y': 330.0862676056338},
- {'dx': 88.2452489943124,
-  'dy': 22.51237896126767,
-  'x': 611.7547510056874,
-  'y': 410.4876210387323}]
+[
+  {
+    "dy": 433,
+    "dx": 327.7153558052434,
+    "x": 0,
+    "y": 0
+  },
+  {
+    "dy": 330.0862676056338,
+    "dx": 372.2846441947566,
+    "x": 327.7153558052434,
+    "y": 0
+  },
+  {
+    "dy": 102.9137323943662,
+    "dx": 215.0977944236371,
+    "x": 327.7153558052434,
+    "y": 330.0862676056338
+  },
+  {
+    "dy": 102.9137323943662,
+    "dx": 68.94160077680677,
+    "x": 542.8131502288805,
+    "y": 330.0862676056338
+  },
+  {
+    "dy": 80.40135343309854,
+    "dx": 88.24524899431273,
+    "x": 611.7547510056874,
+    "y": 330.0862676056338
+  },
+  {
+    "dy": 22.51237896126767,
+    "dx": 88.2452489943124,
+    "x": 611.7547510056874,
+    "y": 410.4876210387323
+  }
+]
 ```
