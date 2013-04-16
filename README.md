@@ -6,6 +6,7 @@ Pure Python implementation of the squarify treemap layout algorithm.
 Based on algorithm from Bruls, Huizing, van Wijk, "Squarified Treemaps", but
 implements it differently.
 
+Homepage: https://github.com/laserson/squarify
 
 Installation
 ------------
