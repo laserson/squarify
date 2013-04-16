@@ -12,11 +12,11 @@ Installation
 
 Using pip:
 
-    pip install squaripy
+    pip install squarify
 
 or using the source:
 
-    git clone git://github.com/laserson/squaripy.git
+    git clone git://github.com/laserson/squarify.git
     cd squarify
     python setup.py install
 
