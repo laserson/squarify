@@ -40,10 +40,10 @@ to the corresponding value.  Here's an example rectangle:
 
 ```json
 {
-    'x': 0.0,
-    'y': 0.0,
-    'dx': 327.7,
-    'dy': 433.0
+    "x": 0.0,
+    "y": 0.0,
+    "dx": 327.7,
+    "dy": 433.0
 }
 ```
 
@@ -78,6 +78,9 @@ values = squarify.normalize_sizes(values, width, height)
 
 # returns a list of rectangles
 rects = squarify.squarify(values, x, y, width, height)
+
+# padded rectangles will probably visualize better for certain cases
+padded_rects = squarify.padded_squarify(values, x, y, width, height)
 ```
 
 The variable `rects` contains
