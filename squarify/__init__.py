@@ -100,5 +100,65 @@ def padded_squarify(sizes, x, y, dx, dy):
     for rect in rects:
         pad_rectangle(rect)
     return rects
+
+def plot(sizes, norm_x=100, norm_y=100,
+         color=None, label=None, value=None,
+         ax=None, **kwargs):
+
+    """
+    Plotting with Matplotlib.
+
+    Parameters
+    ----------
+    sizes: input for squarify
+    norm_x, norm_y: x and y values for normalization
+    color: color string or list-like (see Matplotlib documentation for details)
+    label: list-like used as label text
+    value: list-like used as value text (in most cases identical with sizes argument)
+    ax: Matplotlib Axes instance
+    kwargs: dict, keyword arguments passed to matplotlib.Axes.bar
+
+    Returns
+    -------
+    axes: Matplotlib Axes
+    """
     
+    import matplotlib.pyplot as plt
+
+    if ax is None:
+        ax = plt.gca()
+
+    if color is None:
+        import matplotlib.cm
+        import random
+        cmap = matplotlib.cm.get_cmap()
+        color = [cmap(random.random()) for i in range(len(sizes))]
+
+    normed = normalize_sizes(sizes, norm_x, norm_y)
+    rects = squarify(normed, 0, 0, norm_x, norm_y)
+    
+    x = [rect['x'] for rect in rects]
+    y = [rect['y'] for rect in rects]
+    dx = [rect['dx'] for rect in rects]
+    dy = [rect['dy'] for rect in rects]
+
+    ax.bar(x, dy, width=dx, bottom=y, color=color,
+       label=label, **kwargs)
+
+    if not value is None:
+        va = 'center' if label is None else 'top'
+            
+        for v, r in zip(value, rects):
+            x, y, dx, dy = r['x'], r['y'], r['dx'], r['dy']
+            ax.text(x + dx / 2, y + dy / 2, v, va=va, ha='center')
+
+    if not label is None:
+        va = 'center' if value is None else 'bottom'
+        for l, r in zip(label, rects):
+            x, y, dx, dy = r['x'], r['y'], r['dx'], r['dy']
+            ax.text(x + dx / 2, y + dy / 2, l, va=va, ha='center')
+
+    ax.set_xlim(0, norm_x)
+    ax.set_ylim(0, norm_y)
+    return ax 
     
