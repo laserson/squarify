@@ -5,8 +5,8 @@
 def normalize_sizes(sizes, dx, dy):
     total_size = sum(sizes)
     total_area = dx * dy
-    sizes = map(float, sizes)
-    sizes = map(lambda size: size * total_area / total_size, sizes)
+    sizes = list(map(float, sizes))
+    sizes = list(map(lambda size: size * total_area / total_size, sizes))
     return sizes
 
 def pad_rectangle(rect):
@@ -76,7 +76,7 @@ def squarify(sizes, x, y, dx, dy):
     # sizes should be pre-normalized wrt dx * dy (i.e., they should be same units)
     # or dx * dy == sum(sizes)
     # sizes should be sorted biggest to smallest
-    sizes = map(float, sizes)
+    sizes = list(map(float, sizes))
     
     if len(sizes) == 0:
         return []
