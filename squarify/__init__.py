@@ -7,7 +7,7 @@ def normalize_sizes(sizes, dx, dy):
     total_area = dx * dy
     sizes = map(float, sizes)
     sizes = map(lambda size: size * total_area / total_size, sizes)
-    return sizes
+    return list(sizes)
 
 def pad_rectangle(rect):
     if rect['dx'] > 2:
@@ -76,21 +76,21 @@ def squarify(sizes, x, y, dx, dy):
     # sizes should be pre-normalized wrt dx * dy (i.e., they should be same units)
     # or dx * dy == sum(sizes)
     # sizes should be sorted biggest to smallest
-    sizes = map(float, sizes)
-    
+    sizes = list(map(float, sizes))
+
     if len(sizes) == 0:
         return []
-    
+
     if len(sizes) == 1:
         return layout(sizes, x, y, dx, dy)
-    
+
     # figure out where 'split' should be
     i = 1
     while i < len(sizes) and worst_ratio(sizes[:i], x, y, dx, dy) >= worst_ratio(sizes[:(i+1)], x, y, dx, dy):
         i += 1
     current = sizes[:i]
     remaining = sizes[i:]
-    
+
     (leftover_x, leftover_y, leftover_dx, leftover_dy) = leftover(current, x, y, dx, dy)
     return layout(current, x, y, dx, dy) + \
             squarify(remaining, leftover_x, leftover_y, leftover_dx, leftover_dy)
@@ -122,7 +122,7 @@ def plot(sizes, norm_x=100, norm_y=100,
     -------
     axes: Matplotlib Axes
     """
-    
+
     import matplotlib.pyplot as plt
 
     if ax is None:
@@ -136,7 +136,7 @@ def plot(sizes, norm_x=100, norm_y=100,
 
     normed = normalize_sizes(sizes, norm_x, norm_y)
     rects = squarify(normed, 0, 0, norm_x, norm_y)
-    
+
     x = [rect['x'] for rect in rects]
     y = [rect['y'] for rect in rects]
     dx = [rect['dx'] for rect in rects]
@@ -147,7 +147,7 @@ def plot(sizes, norm_x=100, norm_y=100,
 
     if not value is None:
         va = 'center' if label is None else 'top'
-            
+
         for v, r in zip(value, rects):
             x, y, dx, dy = r['x'], r['y'], r['dx'], r['dy']
             ax.text(x + dx / 2, y + dy / 2, v, va=va, ha='center')
@@ -160,5 +160,4 @@ def plot(sizes, norm_x=100, norm_y=100,
 
     ax.set_xlim(0, norm_x)
     ax.set_ylim(0, norm_y)
-    return ax 
-    
+    return ax
