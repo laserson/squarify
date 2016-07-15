@@ -7,7 +7,7 @@ def normalize_sizes(sizes, dx, dy):
     total_area = dx * dy
     sizes = map(float, sizes)
     sizes = map(lambda size: size * total_area / total_size, sizes)
-    return sizes
+    return list(sizes)
 
 def pad_rectangle(rect):
     if rect['dx'] > 2:
