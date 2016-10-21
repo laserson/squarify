@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name='squarify',
-    version='0.1.3',
+    version='0.2.0',
     packages=['squarify'],
     author='Uri Laserson',
     author_email='uri.laserson@gmail.com',
