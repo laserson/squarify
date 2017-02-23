@@ -143,7 +143,7 @@ def plot(sizes, norm_x=100, norm_y=100,
     dy = [rect['dy'] for rect in rects]
 
     ax.bar(x, dy, width=dx, bottom=y, color=color,
-       label=label, **kwargs)
+       label=label, align='edge', **kwargs)
 
     if not value is None:
         va = 'center' if label is None else 'top'
