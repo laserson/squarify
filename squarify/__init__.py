@@ -103,7 +103,7 @@ def padded_squarify(sizes, x, y, dx, dy):
 
 def plot(sizes, norm_x=100, norm_y=100,
          color=None, label=None, value=None,
-         ax=None, **kwargs):
+         ax=None, labelsize=10, **kwargs):
 
     """
     Plotting with Matplotlib.
@@ -116,6 +116,7 @@ def plot(sizes, norm_x=100, norm_y=100,
     label: list-like used as label text
     value: list-like used as value text (in most cases identical with sizes argument)
     ax: Matplotlib Axes instance
+    label: fontsize of the labels
     kwargs: dict, keyword arguments passed to matplotlib.Axes.bar
 
     Returns
@@ -150,13 +151,13 @@ def plot(sizes, norm_x=100, norm_y=100,
             
         for v, r in zip(value, rects):
             x, y, dx, dy = r['x'], r['y'], r['dx'], r['dy']
-            ax.text(x + dx / 2, y + dy / 2, v, va=va, ha='center')
+            ax.text(x + dx / 2, y + dy / 2, v, va=va, ha='center', fontsize=labelsize)
 
     if not label is None:
         va = 'center' if value is None else 'bottom'
         for l, r in zip(label, rects):
             x, y, dx, dy = r['x'], r['y'], r['dx'], r['dy']
-            ax.text(x + dx / 2, y + dy / 2, l, va=va, ha='center')
+            ax.text(x + dx / 2, y + dy / 2, l, va=va, ha='center', fontsize=labelsize)
 
     ax.set_xlim(0, norm_x)
     ax.set_ylim(0, norm_y)
