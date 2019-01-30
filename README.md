@@ -1,5 +1,6 @@
 squarify
 ========
+[![Build Status](https://travis-ci.org/laserson/squarify.svg?branch=master)](https://travis-ci.org/laserson/squarify)
 
 Pure Python implementation of the squarify treemap layout algorithm.
 
