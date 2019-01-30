@@ -3,41 +3,30 @@ squarify
 
 Pure Python implementation of the squarify treemap layout algorithm.
 
-Based on algorithm from Bruls, Huizing, van Wijk, "Squarified Treemaps", but
+Based on algorithm from [Bruls, Huizing, van Wijk, "Squarified Treemaps"](https://doi.org/10.1007/978-3-7091-6783-0_4), but
 implements it differently.
 
 Installation
 ------------
 
-Compatible with Python 2 and Python 3.
-
-Using pip:
+Compatible with Python 2.7 and Python 3.
 
     pip install squarify
-
-or using the source:
-
-    git clone git://github.com/laserson/squarify.git
-    cd squarify
-    python setup.py install
-
-The last step may require `sudo` if you don't have root access.  The `setup.py`
-script uses `setuptools`/`distribute`.
 
 
 Usage
 -----
 
-The main function is `squarify` and it takes two things:
+The main function is `squarify` and it requires two things:
 
 * A coordinate system comprising values for the origin (`x` and `y`) and the
 width/height (`dx` and `dy`).
 * A list of positive values sorted from largest to smallest and normalized to
 the total area, i.e., `dx * dy`).
 
-The function returns a list of JSON objects, each one a rectangle with
-coordinates corresponding to the given coordinate system and area proportional
-to the corresponding value.  Here's an example rectangle:
+The function returns a list of `dict`s (i.e., JSON objects), each one a
+rectangle with coordinates corresponding to the given coordinate system and area
+proportional to the corresponding value.  Here's an example rectangle:
 
 ```json
 {
@@ -48,12 +37,15 @@ to the corresponding value.  Here's an example rectangle:
 }
 ```
 
-The rectangles can be easily plotted using, for example, [d3.js](http://d3js.org/).
+The rectangles can be easily plotted using, for example,
+[d3.js](http://d3js.org/).
 
 There is also a version of `squarify` called `padded_squarify` that returns
 rectangles that, when laid out, have a bit of padding to show their borders.
 
-The helper function `normalize_sizes` will compute the normalized values.
+The helper function `normalize_sizes` will compute the normalized values, and
+the helper function `plot` will generate a Matplotlib-based treemap
+visualization of your data (see docstring).
 
 
 Example
