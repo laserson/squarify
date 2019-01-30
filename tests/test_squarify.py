@@ -42,7 +42,7 @@ def test_squarify():
     assert len(observed) == len(expected)
     for (o, e) in zip(observed, expected):
         assert len(o) == 4
-        assert set(o.keys()) == {"dx", "dy", "x", "y"}
+        assert set(o.keys()) == set(["dx", "dy", "x", "y"])
         assert o["dx"] == e["dx"]
         assert o["dy"] == e["dy"]
         assert o["x"] == e["x"]
