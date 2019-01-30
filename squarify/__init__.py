@@ -3,12 +3,7 @@
 #   (but not using their pseudocode)
 
 
-def normalize_sizes(sizes, dx, dy):
-    total_size = sum(sizes)
-    total_area = dx * dy
-    sizes = map(float, sizes)
-    sizes = map(lambda size: size * total_area / total_size, sizes)
-    return list(sizes)
+# INTERNAL FUNCTIONS not meant to be used by the user
 
 
 def pad_rectangle(rect):
@@ -93,10 +88,33 @@ def worst_ratio(sizes, x, y, dx, dy):
     )
 
 
+# PUBLIC API
+
+
 def squarify(sizes, x, y, dx, dy):
-    # sizes should be pre-normalized wrt dx * dy (i.e., they should be same units)
-    # or dx * dy == sum(sizes)
-    # sizes should be sorted biggest to smallest
+    """Compute treemap rectangles.
+
+    Given a set of values, computes a treemap layout in the specified geometry
+    using an algorithm based on Bruls, Huizing, van Wijk, "Squarified Treemaps".
+    See README for example usage.
+
+    Parameters
+    ----------
+    sizes : list-like of numeric values
+        The set of values to compute a treemap for. `sizes` must be sorted in
+        descending order and they should be normalized to the total area (i.e.,
+        `dx * dy == sum(sizes)`)
+    x, y : numeric
+        The coordinates of the "origin".
+    dx, dy : numeric
+        The full width (`dx`) and height (`dy`) of the treemap.
+
+    Returns
+    -------
+    list[dict]
+        Each dict in the returned list represents a single rectangle in the
+        treemap. The order corresponds to the input order.
+    """
     sizes = list(map(float, sizes))
 
     if len(sizes) == 0:
@@ -121,10 +139,39 @@ def squarify(sizes, x, y, dx, dy):
 
 
 def padded_squarify(sizes, x, y, dx, dy):
+    """Compute padded treemap rectangles.
+
+    See `squarify` docstring for details. The only difference is that the
+    returned rectangles have been "padded" to allow for a visible border.
+    """
     rects = squarify(sizes, x, y, dx, dy)
     for rect in rects:
         pad_rectangle(rect)
     return rects
+
+
+def normalize_sizes(sizes, dx, dy):
+    """Normalize list of values.
+
+    Normalizes a list of numeric values so that `sum(sizes) == dx * dy`.
+
+    Parameters
+    ----------
+    sizes : list-like of numeric values
+        Input list of numeric values to normalize.
+    dx, dy : numeric
+        The dimensions of the full rectangle to normalize total values to.
+
+    Returns
+    -------
+    list[numeric]
+        The normalized values.
+    """
+    total_size = sum(sizes)
+    total_area = dx * dy
+    sizes = map(float, sizes)
+    sizes = map(lambda size: size * total_area / total_size, sizes)
+    return list(sizes)
 
 
 def plot(
@@ -138,25 +185,33 @@ def plot(
     bar_kwargs=None,
     text_kwargs=None,
 ):
-
-    """
-    Plotting with Matplotlib.
+    """Plotting with Matplotlib.
 
     Parameters
     ----------
-    sizes: input for squarify
-    norm_x, norm_y: x and y values for normalization
-    color: color string or list-like (see Matplotlib documentation for details)
-    label: list-like used as label text
-    value: list-like used as value text (in most cases identical with sizes argument)
-    ax: Matplotlib Axes instance
-    label: fontsize of the labels
-    bar_kwargs: dict, keyword arguments passed to matplotlib.Axes.bar
-    text_kwargs: dict, keyword arguments passed to matplotlib.Axes.text
+    sizes
+        input for squarify
+    norm_x, norm_y
+        x and y values for normalization
+    color
+        color string or list-like (see Matplotlib documentation for details)
+    label
+        list-like used as label text
+    value
+        list-like used as value text (in most cases identical with sizes argument)
+    ax
+        Matplotlib Axes instance
+    label
+        fontsize of the labels
+    bar_kwargs : dict
+        keyword arguments passed to matplotlib.Axes.bar
+    text_kwargs : dict
+        keyword arguments passed to matplotlib.Axes.text
 
     Returns
     -------
-    axes: Matplotlib Axes
+    matplotlib.axes.Axes
+        Matplotlib Axes
     """
 
     import matplotlib.pyplot as plt
