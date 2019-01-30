@@ -101,9 +101,9 @@ def squarify(sizes, x, y, dx, dy):
     Parameters
     ----------
     sizes : list-like of numeric values
-        The set of values to compute a treemap for. `sizes` must be sorted in
-        descending order and they should be normalized to the total area (i.e.,
-        `dx * dy == sum(sizes)`)
+        The set of values to compute a treemap for. `sizes` must be positive
+        values sorted in descending order and they should be normalized to the
+        total area (i.e., `dx * dy == sum(sizes)`)
     x, y : numeric
         The coordinates of the "origin".
     dx, dy : numeric
