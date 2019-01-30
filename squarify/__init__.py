@@ -103,7 +103,7 @@ def padded_squarify(sizes, x, y, dx, dy):
 
 def plot(sizes, norm_x=100, norm_y=100,
          color=None, label=None, value=None,
-         ax=None, **kwargs):
+         ax=None, bar_kwargs={}, text_kwargs={}):
 
     """
     Plotting with Matplotlib.
@@ -116,7 +116,9 @@ def plot(sizes, norm_x=100, norm_y=100,
     label: list-like used as label text
     value: list-like used as value text (in most cases identical with sizes argument)
     ax: Matplotlib Axes instance
-    kwargs: dict, keyword arguments passed to matplotlib.Axes.bar
+    label: fontsize of the labels
+    bar_kwargs: dict, keyword arguments passed to matplotlib.Axes.bar
+    text_kwargs: dict, keyword arguments passed to matplotlib.Axes.text
 
     Returns
     -------
@@ -143,22 +145,22 @@ def plot(sizes, norm_x=100, norm_y=100,
     dy = [rect['dy'] for rect in rects]
 
     ax.bar(x, dy, width=dx, bottom=y, color=color,
-       label=label, align='edge', **kwargs)
+        label=label, align='edge', **bar_kwargs)
 
     if not value is None:
         va = 'center' if label is None else 'top'
             
         for v, r in zip(value, rects):
             x, y, dx, dy = r['x'], r['y'], r['dx'], r['dy']
-            ax.text(x + dx / 2, y + dy / 2, v, va=va, ha='center')
+            ax.text(x + dx / 2, y + dy / 2, v, va=va, ha='center', **text_kwargs)
 
     if not label is None:
         va = 'center' if value is None else 'bottom'
         for l, r in zip(label, rects):
             x, y, dx, dy = r['x'], r['y'], r['dx'], r['dy']
-            ax.text(x + dx / 2, y + dy / 2, l, va=va, ha='center')
+            ax.text(x + dx / 2, y + dy / 2, l, va=va, ha='center', **text_kwargs)
 
     ax.set_xlim(0, norm_x)
     ax.set_ylim(0, norm_y)
-    return ax 
-    
+
+    return ax
