@@ -13,7 +13,7 @@ implements it differently.
 Installation
 ------------
 
-Compatible with Python 2.7 and Python 3.
+Compatible with Python 2 and Python 3.
 
     pip install squarify
 
