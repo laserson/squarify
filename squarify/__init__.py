@@ -184,6 +184,7 @@ def plot(
     ax=None,
     bar_kwargs=None,
     text_kwargs=None,
+    **kwargs,
 ):
     """Plotting with Matplotlib.
 
@@ -207,6 +208,9 @@ def plot(
         keyword arguments passed to matplotlib.Axes.bar
     text_kwargs : dict
         keyword arguments passed to matplotlib.Axes.text
+    **kwargs
+        Any additional kwargs are merged into `bar_kwargs`. Explicitly provided
+        kwargs here will take precedence.
 
     Returns
     -------
@@ -230,6 +234,8 @@ def plot(
         bar_kwargs = {}
     if text_kwargs is None:
         text_kwargs = {}
+    if len(kwargs) > 0:
+        bar_kwargs.update(kwargs)
 
     normed = normalize_sizes(sizes, norm_x, norm_y)
     rects = squarify(normed, 0, 0, norm_x, norm_y)
