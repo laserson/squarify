@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name="squarify",
-    version="0.4.0",
+    version="0.4.1",
     packages=["squarify"],
     author="Uri Laserson",
     author_email="uri.laserson@gmail.com",
