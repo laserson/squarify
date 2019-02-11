@@ -184,7 +184,7 @@ def plot(
     ax=None,
     bar_kwargs=None,
     text_kwargs=None,
-    **kwargs,
+    **kwargs
 ):
     """Plotting with Matplotlib.
 
