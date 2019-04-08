@@ -182,6 +182,7 @@ def plot(
     label=None,
     value=None,
     ax=None,
+    pad=False,
     bar_kwargs=None,
     text_kwargs=None,
     **kwargs
@@ -202,6 +203,8 @@ def plot(
         list-like used as value text (in most cases identical with sizes argument)
     ax
         Matplotlib Axes instance
+    pad
+        draw rectangles with a small gap between them
     label
         fontsize of the labels
     bar_kwargs : dict
@@ -238,7 +241,11 @@ def plot(
         bar_kwargs.update(kwargs)
 
     normed = normalize_sizes(sizes, norm_x, norm_y)
-    rects = squarify(normed, 0, 0, norm_x, norm_y)
+
+    if pad:
+        rects = padded_squarify(normed, 0, 0, norm_x, norm_y)
+    else:
+        rects = squarify(normed, 0, 0, norm_x, norm_y)
 
     x = [rect["x"] for rect in rects]
     y = [rect["y"] for rect in rects]
