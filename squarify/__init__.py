@@ -205,8 +205,6 @@ def plot(
         Matplotlib Axes instance
     pad
         draw rectangles with a small gap between them
-    label
-        fontsize of the labels
     bar_kwargs : dict
         keyword arguments passed to matplotlib.Axes.bar
     text_kwargs : dict
