@@ -254,14 +254,14 @@ def plot(
         x, dy, width=dx, bottom=y, color=color, label=label, align="edge", **bar_kwargs
     )
 
-    if not value is None:
+    if value is not None:
         va = "center" if label is None else "top"
 
         for v, r in zip(value, rects):
             x, y, dx, dy = r["x"], r["y"], r["dx"], r["dy"]
             ax.text(x + dx / 2, y + dy / 2, v, va=va, ha="center", **text_kwargs)
 
-    if not label is None:
+    if label is not None:
         va = "center" if value is None else "bottom"
         for l, r in zip(label, rects):
             x, y, dx, dy = r["x"], r["y"], r["dx"], r["dy"]
