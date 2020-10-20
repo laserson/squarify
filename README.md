@@ -56,7 +56,7 @@ rectangles that, when laid out, have a bit of padding to show their borders.
 
 The helper function `normalize_sizes` will compute the normalized values, and
 the helper function `plot` will generate a Matplotlib-based treemap
-visualization of your data (see [documentation](DOCUMENTATION.md)).
+visualization of your data (see [documentation](#Documentation-for-Squarify)).
 
 
 Example
