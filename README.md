@@ -12,10 +12,12 @@ implements it differently.
 
 ## Contents
 
-* [Installation](#Installation)
-* [Usage](#Usage)
-* [Example](#Example)
-* [Documentation](#Documentation-for-Squarify)
+- [squarify](#squarify)
+  - [Contents](#contents)
+  - [Installation](#installation)
+  - [Usage](#usage)
+  - [Example](#example)
+  - [Documentation for Squarify](#documentation-for-squarify)
 
 Installation
 ------------
@@ -140,7 +142,7 @@ Normalizes a list of numeric values so that `sum(sizes) == dx * dy`.
 
 **Parameters**
 
-    sizes : list-like of numeric values
+    sizes : (nested-)list-like of numeric values
         Input list of numeric values to normalize.
     dx, dy : numeric
         The dimensions of the full rectangle to normalize total values to.
@@ -203,7 +205,7 @@ See README for example usage.
 
 **Parameters**
 
-    sizes : list-like of numeric values
+    sizes : (nested-)list-like of numeric values
         The set of values to compute a treemap for. `sizes` must be positive
         values sorted in descending order and they should be normalized to the
         total area (i.e., `dx * dy == sum(sizes)`)

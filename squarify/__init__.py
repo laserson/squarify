@@ -6,14 +6,13 @@
 # INTERNAL FUNCTIONS not meant to be used by the user
 
 
-def pad_rectangle(rect):
-    if rect["dx"] > 2:
-        rect["x"] += 1
-        rect["dx"] -= 2
-    if rect["dy"] > 2:
-        rect["y"] += 1
-        rect["dy"] -= 2
-
+def pad_rectangle(rect, pad=1):
+    if rect["dx"] > 2*pad:
+        rect["x"] += pad
+        rect["dx"] -= 2*pad
+    if rect["dy"] > 2*pad:
+        rect["y"] += pad
+        rect["dy"] -= 2*pad
 
 def layoutrow(sizes, x, y, dx, dy):
     # generate rects for each size in sizes
@@ -138,7 +137,7 @@ def squarify(sizes, x, y, dx, dy):
     )
 
 
-def padded_squarify(sizes, x, y, dx, dy):
+def padded_squarify(sizes, x, y, dx, dy, pad=1):
     """Compute padded treemap rectangles.
 
     See `squarify` docstring for details. The only difference is that the
@@ -146,7 +145,7 @@ def padded_squarify(sizes, x, y, dx, dy):
     """
     rects = squarify(sizes, x, y, dx, dy)
     for rect in rects:
-        pad_rectangle(rect)
+        pad_rectangle(rect, pad=pad)
     return rects
 
 
@@ -167,11 +166,13 @@ def normalize_sizes(sizes, dx, dy):
     list[numeric]
         The normalized values.
     """
-    total_size = sum(sizes)
+    if isinstance(sizes, list):
+        import numpy as np
+        sizes = np.array(sizes)
+        
+    total_size = sizes.sum()
     total_area = dx * dy
-    sizes = map(float, sizes)
-    sizes = map(lambda size: size * total_area / total_size, sizes)
-    return list(sizes)
+    return sizes * total_area / total_size
 
 
 def plot(
@@ -218,7 +219,10 @@ def plot(
     matplotlib.axes.Axes
         Matplotlib Axes
     """
-
+    if isinstance(sizes, list):
+        import numpy as np
+        sizes = np.array(sizes)
+        
     import matplotlib.pyplot as plt
 
     if ax is None:
@@ -241,9 +245,29 @@ def plot(
     normed = normalize_sizes(sizes, norm_x, norm_y)
 
     if pad:
-        rects = padded_squarify(normed, 0, 0, norm_x, norm_y)
+        if len(normed.shape) == 1:
+            rects = padded_squarify(normed, 0, 0, norm_x, norm_y, pad=pad)
+        else:
+            rects = []
+            group_rects = padded_squarify(normed.sum(axis=1), 0, 0, norm_x, norm_y, pad=2)
+            for i, group_rect in enumerate(group_rects):
+                x, y = group_rect["x"], group_rect["y"]
+                dx = group_rect["dx"]
+                dy = group_rect["dy"]
+                delta = normed[i].sum() - dx*dy
+                rects += padded_squarify(normed[i] - delta/len(normed[i]), x, y, dx, dy, pad=1)
+                
     else:
-        rects = squarify(normed, 0, 0, norm_x, norm_y)
+        if len(normed.shape) == 1:
+            rects = padded_squarify(normed, 0, 0, norm_x, norm_y)
+        else:
+            rects = []
+            group_rects = squarify(normed.sum(axis=1), 0, 0, norm_x, norm_y)
+            for i, group_rect in enumerate(group_rects):
+                x, y = group_rect["x"], group_rect["y"]
+                dx = group_rect["dx"]
+                dy = group_rect["dy"]
+                rects += squarify(normed[i], x, y, dx, dy)
 
     x = [rect["x"] for rect in rects]
     y = [rect["y"] for rect in rects]
@@ -254,14 +278,14 @@ def plot(
         x, dy, width=dx, bottom=y, color=color, label=label, align="edge", **bar_kwargs
     )
 
-    if value is not None:
+    if not value is None:
         va = "center" if label is None else "top"
 
         for v, r in zip(value, rects):
             x, y, dx, dy = r["x"], r["y"], r["dx"], r["dy"]
             ax.text(x + dx / 2, y + dy / 2, v, va=va, ha="center", **text_kwargs)
 
-    if label is not None:
+    if not label is None:
         va = "center" if value is None else "bottom"
         for l, r in zip(label, rects):
             x, y, dx, dy = r["x"], r["y"], r["dx"], r["dy"]
