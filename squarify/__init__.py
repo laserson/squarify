@@ -14,6 +14,7 @@ def pad_rectangle(rect, pad=1):
         rect["y"] += pad
         rect["dy"] -= 2*pad
 
+
 def layoutrow(sizes, x, y, dx, dy):
     # generate rects for each size in sizes
     # dx >= dy
@@ -92,11 +93,9 @@ def worst_ratio(sizes, x, y, dx, dy):
 
 def squarify(sizes, x, y, dx, dy):
     """Compute treemap rectangles.
-
     Given a set of values, computes a treemap layout in the specified geometry
     using an algorithm based on Bruls, Huizing, van Wijk, "Squarified Treemaps".
     See README for example usage.
-
     Parameters
     ----------
     sizes : list-like of numeric values
@@ -107,7 +106,6 @@ def squarify(sizes, x, y, dx, dy):
         The coordinates of the "origin".
     dx, dy : numeric
         The full width (`dx`) and height (`dy`) of the treemap.
-
     Returns
     -------
     list[dict]
@@ -139,40 +137,60 @@ def squarify(sizes, x, y, dx, dy):
 
 def padded_squarify(sizes, x, y, dx, dy, pad=1):
     """Compute padded treemap rectangles.
-
     See `squarify` docstring for details. The only difference is that the
     returned rectangles have been "padded" to allow for a visible border.
     """
     rects = squarify(sizes, x, y, dx, dy)
     for rect in rects:
-        pad_rectangle(rect, pad=pad)
+        pad_rectangle(rect, pad)
     return rects
 
 
 def normalize_sizes(sizes, dx, dy):
     """Normalize list of values.
-
     Normalizes a list of numeric values so that `sum(sizes) == dx * dy`.
-
     Parameters
     ----------
     sizes : list-like of numeric values
         Input list of numeric values to normalize.
     dx, dy : numeric
         The dimensions of the full rectangle to normalize total values to.
-
     Returns
     -------
     list[numeric]
         The normalized values.
     """
-    if isinstance(sizes, list):
-        import numpy as np
-        sizes = np.array(sizes)
-        
-    total_size = sizes.sum()
+    total_size = sum(sizes)
     total_area = dx * dy
-    return sizes * total_area / total_size
+    sizes = map(float, sizes)
+    sizes = map(lambda size: size * total_area / total_size, sizes)
+    return list(sizes)
+
+
+def normalize_subgroup_sizes(group_sizes, dx, dy):
+    """Normalize nested list of values.
+    Normalize a nested list of numeric values so that `sum(sizes) == dx * dy`.
+    Parameters
+    ----------
+    group_sizes : nested-list-like of numeric values
+        Input nested list of numeric values to normalize.
+    dx, dy : numeric
+        The dimensions of the full rectangle to normalize total values to.
+    Returns
+    -------
+    nested list [numeric]
+        The normalized values.
+    """
+    stacked_sizes = [item for sublist in group_sizes for item in sublist]
+    normed = normalize_sizes(stacked_sizes, dx, dy)
+    
+    group_normed = []
+    start = 0
+    for sizes in group_sizes:
+        group_normed.append(normed[start : start + len(sizes)])
+        start += len(sizes)
+
+    return group_normed
 
 
 def plot(
@@ -189,7 +207,6 @@ def plot(
     **kwargs
 ):
     """Plotting with Matplotlib.
-
     Parameters
     ----------
     sizes
@@ -213,16 +230,12 @@ def plot(
     **kwargs
         Any additional kwargs are merged into `bar_kwargs`. Explicitly provided
         kwargs here will take precedence.
-
     Returns
     -------
     matplotlib.axes.Axes
         Matplotlib Axes
     """
-    if isinstance(sizes, list):
-        import numpy as np
-        sizes = np.array(sizes)
-        
+
     import matplotlib.pyplot as plt
 
     if ax is None:
@@ -245,29 +258,9 @@ def plot(
     normed = normalize_sizes(sizes, norm_x, norm_y)
 
     if pad:
-        if len(normed.shape) == 1:
-            rects = padded_squarify(normed, 0, 0, norm_x, norm_y, pad=pad)
-        else:
-            rects = []
-            group_rects = padded_squarify(normed.sum(axis=1), 0, 0, norm_x, norm_y, pad=2)
-            for i, group_rect in enumerate(group_rects):
-                x, y = group_rect["x"], group_rect["y"]
-                dx = group_rect["dx"]
-                dy = group_rect["dy"]
-                delta = normed[i].sum() - dx*dy
-                rects += padded_squarify(normed[i] - delta/len(normed[i]), x, y, dx, dy, pad=1)
-                
+        rects = padded_squarify(normed, 0, 0, norm_x, norm_y)
     else:
-        if len(normed.shape) == 1:
-            rects = padded_squarify(normed, 0, 0, norm_x, norm_y)
-        else:
-            rects = []
-            group_rects = squarify(normed.sum(axis=1), 0, 0, norm_x, norm_y)
-            for i, group_rect in enumerate(group_rects):
-                x, y = group_rect["x"], group_rect["y"]
-                dx = group_rect["dx"]
-                dy = group_rect["dy"]
-                rects += squarify(normed[i], x, y, dx, dy)
+        rects = squarify(normed, 0, 0, norm_x, norm_y)
 
     x = [rect["x"] for rect in rects]
     y = [rect["y"] for rect in rects]
@@ -278,16 +271,134 @@ def plot(
         x, dy, width=dx, bottom=y, color=color, label=label, align="edge", **bar_kwargs
     )
 
-    if not value is None:
+    if value is not None:
         va = "center" if label is None else "top"
 
         for v, r in zip(value, rects):
             x, y, dx, dy = r["x"], r["y"], r["dx"], r["dy"]
             ax.text(x + dx / 2, y + dy / 2, v, va=va, ha="center", **text_kwargs)
 
-    if not label is None:
+    if label is not None:
         va = "center" if value is None else "bottom"
         for l, r in zip(label, rects):
+            x, y, dx, dy = r["x"], r["y"], r["dx"], r["dy"]
+            ax.text(x + dx / 2, y + dy / 2, l, va=va, ha="center", **text_kwargs)
+
+    ax.set_xlim(0, norm_x)
+    ax.set_ylim(0, norm_y)
+
+    return ax
+
+
+def plot_subgroup(
+    sizes,
+    norm_x=100,
+    norm_y=100,
+    color=None,
+    label=None,
+    grouplabel=None,
+    value=None,
+    ax=None,
+    pad=True,
+    bar_kwargs=None,
+    text_kwargs=None,
+    **kwargs
+):
+    """Plotting with Matplotlib.
+    Parameters
+    ----------
+    sizes
+        nested list of input for squarify
+    norm_x, norm_y
+        x and y values for normalization
+    color
+        color string or list-like (see Matplotlib documentation for details)
+    label
+        list-like used as label text
+    grouplabel
+        list-like used as group label text
+    value
+        list-like used as value text (in most cases identical with sizes argument)
+    ax
+        Matplotlib Axes instance
+    pad
+        draw rectangles with a small gap between them
+    bar_kwargs : dict
+        keyword arguments passed to matplotlib.Axes.bar
+    text_kwargs : dict
+        keyword arguments passed to matplotlib.Axes.text
+    **kwargs
+        Any additional kwargs are merged into `bar_kwargs`. Explicitly provided
+        kwargs here will take precedence.
+    Returns
+    -------
+    matplotlib.axes.Axes
+        Matplotlib Axes
+    """
+
+    import matplotlib.pyplot as plt
+
+    if ax is None:
+        ax = plt.gca()
+
+    if color is None:
+        import matplotlib.cm
+        import random
+
+        cmap = matplotlib.cm.get_cmap()
+        color = [cmap(random.random()) for i in range(len(sizes))]
+
+    if bar_kwargs is None:
+        bar_kwargs = {}
+    if text_kwargs is None:
+        text_kwargs = {}
+    if len(kwargs) > 0:
+        bar_kwargs.update(kwargs)
+
+    normed = normalize_subgroup_sizes(sizes, norm_x, norm_y)
+
+    if pad:
+        rects = []
+        group_rects = padded_squarify([sum(subgroup) for subgroup in normed], 0, 0, norm_x, norm_y, pad=2)
+        for i, group_rect in enumerate(group_rects):
+            x, y = group_rect["x"], group_rect["y"]
+            dx, dy = group_rect["dx"], group_rect["dy"]
+            delta_area = sum(normed[i]) - dx * dy
+            rects += padded_squarify([normed[i][j] - delta_area/len(normed[i]) for j in range(len(normed[i]))], x, y, dx, dy, pad=1)   
+    else:
+        rects = []
+        group_rects = squarify([sum(subgroup) for subgroup in normed], 0, 0, norm_x, norm_y)
+        for i, group_rect in enumerate(group_rects):
+            x, y = group_rect["x"], group_rect["y"]
+            dx, dy = group_rect["dx"], group_rect["dy"]
+            delta_area = sum(normed[i]) - dx * dy
+            rects += squarify([normed[i][j] - delta_area/len(normed[i]) for j in range(len(normed[i]))], x, y, dx, dy)
+
+    x = [rect["x"] for rect in rects]
+    y = [rect["y"] for rect in rects]
+    dx = [rect["dx"] for rect in rects]
+    dy = [rect["dy"] for rect in rects]
+
+    ax.bar(
+        x, dy, width=dx, bottom=y, color=color, label=label, align="edge", **bar_kwargs
+    )
+
+    if value is not None:
+        va = "center" if label is None else "top"
+
+        for v, r in zip(value, rects):
+            x, y, dx, dy = r["x"], r["y"], r["dx"], r["dy"]
+            ax.text(x + dx / 2, y + dy / 2, v, va=va, ha="center", **text_kwargs)
+
+    if label is not None:
+        va = "center" if value is None else "bottom"
+        for l, r in zip(label, rects):
+            x, y, dx, dy = r["x"], r["y"], r["dx"], r["dy"]
+            ax.text(x + dx / 2, y + dy / 2, l, va=va, ha="center", **text_kwargs)
+            
+    if grouplabel is not None:
+        va = "center" if value is None else "bottom"
+        for l, r in zip(grouplabel, group_rects):
             x, y, dx, dy = r["x"], r["y"], r["dx"], r["dy"]
             ax.text(x + dx / 2, y + dy / 2, l, va=va, ha="center", **text_kwargs)
 
