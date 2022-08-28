@@ -182,7 +182,7 @@ def plot(
     color=None,
     label=None,
     value=None,
-    align=None,
+    loc=None,
     ax=None,
     pad=False,
     bar_kwargs=None,
@@ -203,6 +203,8 @@ def plot(
         list-like used as label text
     value
         list-like used as value text (in most cases identical with sizes argument)
+    loc
+        string that specifies text (label and/or value) location inside rectangles
     ax
         Matplotlib Axes instance
     pad
@@ -267,35 +269,35 @@ def plot(
         for text, rect in zip(texts, rects):
             x, y, dx, dy = rect["x"], rect["y"], rect["dx"], rect["dy"]
 
-            # Text alignment
-            if align == "center":
+            # Text location
+            if loc == "center":
                 h_offset = dx / 2
                 v_offset = dy / 2
                 va = "center"
                 ha = "center"
             else:
-                match = re.match(r"([a-z]+) ([a-z]+)", align)
-                v_align, h_align = match.groups()
+                match = re.match(r"([a-z]+) ([a-z]+)", loc)
+                v_loc, h_loc = match.groups()
 
-                # Vertical alignment
-                if v_align == 'top':
+                # Vertical location
+                if v_loc == 'top':
                     va = "top"
                     v_offset = dy - 1
-                elif v_align == 'center':
+                elif v_loc == 'center':
                     va = "center"
                     v_offset = dy / 2
-                elif v_align == 'bottom':
+                elif v_loc == 'bottom':
                     va = "bottom"
                     v_offset = 1
 
-                # Horizontal alignment
-                if h_align == 'left':
+                # Horizontal location
+                if h_loc == 'left':
                     ha = "left"
                     h_offset = 1
-                elif h_align == 'center':
+                elif h_loc == 'center':
                     ha = "center"
                     h_offset = dx / 2
-                elif h_align == 'right':
+                elif h_loc == 'right':
                     ha = "right"
                     h_offset = dx - 1
 
