@@ -5,6 +5,7 @@
 
 # INTERNAL FUNCTIONS not meant to be used by the user
 
+import re
 
 def pad_rectangle(rect):
     if rect["dx"] > 2:
@@ -181,6 +182,7 @@ def plot(
     color=None,
     label=None,
     value=None,
+    align=None,
     ax=None,
     pad=False,
     bar_kwargs=None,
@@ -254,18 +256,50 @@ def plot(
         x, dy, width=dx, bottom=y, color=color, label=label, align="edge", **bar_kwargs
     )
 
-    if value is not None:
-        va = "center" if label is None else "top"
+    if value or label:
+        if value and label:
+            # If both values and labels are specified, unify them in single text fields
+            texts = ["%s\n%s" % (l, v) for l, v in zip(label, value)]
+        else:
+            # Otherwise keep only the non-empty one as text fields
+            texts = value if value else label
 
-        for v, r in zip(value, rects):
-            x, y, dx, dy = r["x"], r["y"], r["dx"], r["dy"]
-            ax.text(x + dx / 2, y + dy / 2, v, va=va, ha="center", **text_kwargs)
+        for text, rect in zip(texts, rects):
+            x, y, dx, dy = rect["x"], rect["y"], rect["dx"], rect["dy"]
 
-    if label is not None:
-        va = "center" if value is None else "bottom"
-        for l, r in zip(label, rects):
-            x, y, dx, dy = r["x"], r["y"], r["dx"], r["dy"]
-            ax.text(x + dx / 2, y + dy / 2, l, va=va, ha="center", **text_kwargs)
+            # Text alignment
+            if align == "center":
+                h_offset = dx / 2
+                v_offset = dy / 2
+                va = "center"
+                ha = "center"
+            else:
+                match = re.match(r"([a-z]+) ([a-z]+)", align)
+                v_align, h_align = match.groups()
+
+                # Vertical alignment
+                if v_align == 'top':
+                    va = "top"
+                    v_offset = dy - 1
+                elif v_align == 'center':
+                    va = "center"
+                    v_offset = dy / 2
+                elif v_align == 'bottom':
+                    va = "bottom"
+                    v_offset = 1
+
+                # Horizontal alignment
+                if h_align == 'left':
+                    ha = "left"
+                    h_offset = 1
+                elif h_align == 'center':
+                    ha = "center"
+                    h_offset = dx / 2
+                elif h_align == 'right':
+                    ha = "right"
+                    h_offset = dx - 1
+
+            ax.text(x + h_offset, y + v_offset, text, va=va, ha=ha, **text_kwargs)
 
     ax.set_xlim(0, norm_x)
     ax.set_ylim(0, norm_y)
