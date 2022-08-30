@@ -88,6 +88,68 @@ def worst_ratio(sizes, x, y, dx, dy):
     )
 
 
+def get_text_rgba(backround_rgba):
+    """Between black and white, get the color most contrasting with the background.
+
+    Parameters
+    ----------
+    backround_rgba
+        RGBA tuple of floats in the range of zero to one.
+
+    Returns
+    -------
+    tuple
+        RGBA tuple of floats in the range of zero to one
+    """
+    
+    from math import sqrt
+    
+    text_rgba = (0.0, 0.0, 0.0, 1.0)
+    if backround_rgba != (1.0, 1.0, 1.0, 1.0):
+        text_colors_list = []
+        for from_color in [(1.0, 1.0, 1.0, 1.0), (0.0, 0.0, 0.0, 1.0)]:
+            green_diff = from_color[0] - backround_rgba[0]
+            blue_diff = from_color[1] - backround_rgba[1]
+            red_diff = from_color[2] - backround_rgba[2]
+            color_distance = sqrt(green_diff**2 + blue_diff**2 + red_diff**2)
+            color_tuple = (color_distance, from_color)
+            text_colors_list.append(color_tuple)
+        text_rgba = sorted(text_colors_list, key=lambda x: x[0])[-1][1]
+    
+    return text_rgba
+
+
+def draw_text(ax, s, r, c, va, text_kwargs):
+    """Drawing text with Matplotlib.
+
+    Parameters
+    ----------
+    ax
+        Matplotlib Axes instance
+    s : str
+        The text
+    r : dict
+        keyword arguments that describe the rectangle
+    c : tuple
+        RGBA color tuple of floats in the range of zero to one
+    va : str
+        {'center', 'top', 'bottom', 'baseline', 'center_baseline'} passed to matplotlib.Axes.text for vertical alignment
+    text_kwargs : dict
+        keyword arguments passed to matplotlib.Axes.text.
+    """
+    
+    # Get text position and draw text
+    x = r['x'] + (r['dx'] / 2)
+    y = r['y'] + (r['dy'] / 2)
+    text_obj = ax.text(x=x, y=y, s=s, va=va, ha='center', **text_kwargs)
+
+    if not (('color' in text_kwargs) or ('c' in text_kwargs)):
+
+        # Set text color to the highest contrast between black and white
+        text_rgba = get_text_rgba(c)
+        text_obj.set_color(text_rgba)
+
+
 # PUBLIC API
 
 
@@ -173,7 +235,6 @@ def normalize_sizes(sizes, dx, dy):
     sizes = map(lambda size: size * total_area / total_size, sizes)
     return list(sizes)
 
-
 def plot(
     sizes,
     norm_x=100,
@@ -196,7 +257,7 @@ def plot(
     norm_x, norm_y
         x and y values for normalization
     color
-        color string or list-like (see Matplotlib documentation for details)
+        color string or list-like of RGBA tuples (see Matplotlib documentation for details)
     label
         list-like used as label text
     value
@@ -220,10 +281,12 @@ def plot(
     """
 
     import matplotlib.pyplot as plt
-
+    
+    # Create axes if necessary
     if ax is None:
         ax = plt.gca()
-
+    
+    # Create color list, if necessary
     if color is None:
         import matplotlib.cm
         import random
@@ -237,37 +300,38 @@ def plot(
         text_kwargs = {}
     if len(kwargs) > 0:
         bar_kwargs.update(kwargs)
-
+    
+    # Get the list of rectangles
     normed = normalize_sizes(sizes, norm_x, norm_y)
-
     if pad:
         rects = padded_squarify(normed, 0, 0, norm_x, norm_y)
     else:
         rects = squarify(normed, 0, 0, norm_x, norm_y)
-
-    x = [rect["x"] for rect in rects]
-    y = [rect["y"] for rect in rects]
-    dx = [rect["dx"] for rect in rects]
-    dy = [rect["dy"] for rect in rects]
-
-    ax.bar(
-        x, dy, width=dx, bottom=y, color=color, label=label, align="edge", **bar_kwargs
-    )
-
+    
+    # Draw the rectangles as horizontal bars with the bottom at y
+    x = [rect['x'] for rect in rects]
+    y = [rect['y'] for rect in rects]
+    dx = [rect['dx'] for rect in rects]
+    dy = [rect['dy'] for rect in rects]
+    ax.bar(x=x, height=dy, width=dx, bottom=y, color=color, label=label, align='edge', **bar_kwargs)
+    
     if value is not None:
-        va = "center" if label is None else "top"
-
-        for v, r in zip(value, rects):
-            x, y, dx, dy = r["x"], r["y"], r["dx"], r["dy"]
-            ax.text(x + dx / 2, y + dy / 2, v, va=va, ha="center", **text_kwargs)
-
+    
+        # Draw the values in the centers or tops of the rectangles
+        va = 'center' if label is None else 'top'
+        for v, r, c in zip(value, rects, color):
+            draw_text(ax, v, r, c, va, text_kwargs)
+    
     if label is not None:
-        va = "center" if value is None else "bottom"
-        for l, r in zip(label, rects):
-            x, y, dx, dy = r["x"], r["y"], r["dx"], r["dy"]
-            ax.text(x + dx / 2, y + dy / 2, l, va=va, ha="center", **text_kwargs)
-
+    
+        # Draw the labels in the centers or bottoms of the rectangles
+        va = 'center' if value is None else 'bottom'
+        for l, r, c in zip(label, rects, color):
+            draw_text(ax, l, r, c, va, text_kwargs)
+    
     ax.set_xlim(0, norm_x)
     ax.set_ylim(0, norm_y)
+    ax.axes.xaxis.set_visible(False)
+    ax.axes.yaxis.set_visible(False)
 
     return ax
