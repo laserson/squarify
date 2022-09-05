@@ -7,6 +7,9 @@
 
 import re
 
+_location_error_message = "Invalid location string: '%s'."
+
+
 def pad_rectangle(rect):
     if rect["dx"] > 2:
         rect["x"] += 1
@@ -193,26 +196,49 @@ def plot(
 
     Parameters
     ----------
-    sizes
+    sizes :
         input for squarify
-    norm_x, norm_y
+
+    norm_x, norm_y :
         x and y values for normalization
-    color
+
+    color :
         color string or list-like (see Matplotlib documentation for details)
-    label
+
+    label :
         list-like used as label text
-    value
+
+    value :
         list-like used as value text (in most cases identical with sizes argument)
-    loc
-        string that specifies text (label and/or value) location inside rectangles
-    ax
+
+    loc :
+        The location of the texts (labels and/or values) inside the rectangles.
+
+        The strings
+        ``'upper left', 'upper right', 'lower left', 'lower right'``
+        place the text at the corresponding corner of the rectangles.
+
+        The strings
+        ``'upper center', 'lower center', 'center left', 'center right'``
+        place the text at the center of the corresponding edge of the
+        rectangles.
+
+        The string ``'center'`` places the text at the center of the rectangles.
+
+        ``NoneType`` defaults to ``'center'``.
+
+    ax :
         Matplotlib Axes instance
-    pad
+
+    pad :
         draw rectangles with a small gap between them
+
     bar_kwargs : dict
         keyword arguments passed to matplotlib.Axes.bar
+
     text_kwargs : dict
         keyword arguments passed to matplotlib.Axes.text
+
     **kwargs
         Any additional kwargs are merged into `bar_kwargs`. Explicitly provided
         kwargs here will take precedence.
@@ -270,36 +296,43 @@ def plot(
             x, y, dx, dy = rect["x"], rect["y"], rect["dx"], rect["dy"]
 
             # Text location
-            if loc == "center":
+            if (loc is None) or (loc == "center"):
                 h_offset = dx / 2
                 v_offset = dy / 2
                 va = "center"
                 ha = "center"
             else:
                 match = re.match(r"([a-z]+) ([a-z]+)", loc)
-                v_loc, h_loc = match.groups()
+                try:
+                    v_loc, h_loc = match.groups()
+                except AttributeError as e:
+                    raise ValueError(_location_error_message % loc)
 
                 # Vertical location
-                if v_loc == 'top':
+                if v_loc == "upper":
                     va = "top"
                     v_offset = dy - 1
-                elif v_loc == 'center':
+                elif v_loc == "center":
                     va = "center"
                     v_offset = dy / 2
-                elif v_loc == 'bottom':
+                elif v_loc == "lower":
                     va = "bottom"
                     v_offset = 1
+                else:
+                    raise ValueError(_location_error_message % loc)
 
                 # Horizontal location
-                if h_loc == 'left':
+                if h_loc == "left":
                     ha = "left"
                     h_offset = 1
-                elif h_loc == 'center':
+                elif h_loc == "center":
                     ha = "center"
                     h_offset = dx / 2
-                elif h_loc == 'right':
+                elif h_loc == "right":
                     ha = "right"
                     h_offset = dx - 1
+                else:
+                    raise ValueError(_location_error_message % loc)
 
             ax.text(x + h_offset, y + v_offset, text, va=va, ha=ha, **text_kwargs)
 
