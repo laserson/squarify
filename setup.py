@@ -7,7 +7,7 @@ setup(
     author="Uri Laserson",
     author_email="uri.laserson@gmail.com",
     description="Pure Python implementation of the squarify treemap layout algorithm",
-    license="Apache License 2.0",
+    license="Apache v2",
     keywords="treemap visualization squarify layout graphics",
     classifiers=[
         "Programming Language :: Python :: 2.6",

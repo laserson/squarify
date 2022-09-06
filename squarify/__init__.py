@@ -178,6 +178,19 @@ def normalize_sizes(sizes, dx, dy):
     return list(sizes)
 
 
+# helpers for annot placement
+_v_offsets = {
+    "top": lambda dy: dy - 1,
+    "center": lambda dy: dy / 2,
+    "bottom": lambda dy: 1,
+}
+_h_offsets = {
+    "left": lambda dx: 1,
+    "center": lambda dx: dx / 2,
+    "right": lambda dx: dx - 1,
+}
+
+
 def plot(
     sizes,
     norm_x=100,
@@ -190,7 +203,7 @@ def plot(
     pad=False,
     bar_kwargs=None,
     text_kwargs=None,
-    **kwargs
+    **kwargs,
 ):
     """Plotting with Matplotlib.
 
@@ -215,11 +228,11 @@ def plot(
         The location of the texts (labels and/or values) inside the rectangles.
 
         The strings
-        ``'upper left', 'upper right', 'lower left', 'lower right'``
+        ``'top left', 'top right', 'bottom left', 'bottom right'``
         place the text at the corresponding corner of the rectangles.
 
         The strings
-        ``'upper center', 'lower center', 'center left', 'center right'``
+        ``'top center', 'bottom center', 'center left', 'center right'``
         place the text at the center of the corresponding edge of the
         rectangles.
 
@@ -284,57 +297,37 @@ def plot(
         x, dy, width=dx, bottom=y, color=color, label=label, align="edge", **bar_kwargs
     )
 
-    if value or label:
-        if value and label:
-            # If both values and labels are specified, unify them in single text fields
-            texts = ["%s\n%s" % (l, v) for l, v in zip(label, value)]
-        else:
-            # Otherwise keep only the non-empty one as text fields
-            texts = value if value else label
+    if value and label:
+        # If both values and labels are specified, unify them in single text fields
+        texts = ["%s\n%s" % (l, v) for l, v in zip(label, value)]
+    elif value or label:
+        # Otherwise keep only the non-empty one as text fields
+        texts = value if value else label
+    else:
+        texts = None
 
+    if texts:
+        # Set up annot locations
+        if loc is None or loc == "center":
+            va, ha = "center", "center"
+        else:
+            va, ha = loc.split()
+            if va not in {"top", "center", "bottom"}:
+                raise ValueError(f"Invalid `loc` string: {loc}")
+            if ha not in {"left", "center", "right"}:
+                raise ValueError(f"Invalid `loc` string: {loc}")
+
+        # Add the annot
         for text, rect in zip(texts, rects):
             x, y, dx, dy = rect["x"], rect["y"], rect["dx"], rect["dy"]
-
-            # Text location
-            if (loc is None) or (loc == "center"):
-                h_offset = dx / 2
-                v_offset = dy / 2
-                va = "center"
-                ha = "center"
-            else:
-                match = re.match(r"([a-z]+) ([a-z]+)", loc)
-                try:
-                    v_loc, h_loc = match.groups()
-                except AttributeError as e:
-                    raise ValueError(_location_error_message % loc)
-
-                # Vertical location
-                if v_loc == "upper":
-                    va = "top"
-                    v_offset = dy - 1
-                elif v_loc == "center":
-                    va = "center"
-                    v_offset = dy / 2
-                elif v_loc == "lower":
-                    va = "bottom"
-                    v_offset = 1
-                else:
-                    raise ValueError(_location_error_message % loc)
-
-                # Horizontal location
-                if h_loc == "left":
-                    ha = "left"
-                    h_offset = 1
-                elif h_loc == "center":
-                    ha = "center"
-                    h_offset = dx / 2
-                elif h_loc == "right":
-                    ha = "right"
-                    h_offset = dx - 1
-                else:
-                    raise ValueError(_location_error_message % loc)
-
-            ax.text(x + h_offset, y + v_offset, text, va=va, ha=ha, **text_kwargs)
+            ax.text(
+                x + _h_offsets[ha](dx),
+                y + _v_offsets[va](dy),
+                text,
+                va=va,
+                ha=ha,
+                **text_kwargs,
+            )
 
     ax.set_xlim(0, norm_x)
     ax.set_ylim(0, norm_y)

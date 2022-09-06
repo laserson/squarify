@@ -160,54 +160,29 @@ returned rectangles have been "padded" to allow for a visible border.
 
 ----------------------------------------------------------------------------------------
 
-`plot(sizes, norm_x=100, norm_y=100, color=None, label=None, value=None, loc=None, ax=None, pad=False, bar_kwargs=None, text_kwargs=None, **kwargs)`
+`plot(sizes, norm_x=100, norm_y=100, color=None, label=None, value=None, ax=None, pad=False, bar_kwargs=None, text_kwargs=None, **kwargs)`
 :   Plotting with Matplotlib.
 
 **Parameters**
 
-    sizes : 
+    sizes
         input for squarify
-
-    norm_x, norm_y :
+    norm_x, norm_y
         x and y values for normalization
-
-    color :
+    color
         color string or list-like (see Matplotlib documentation for details)
-
-    label :
+    label
         list-like used as label text
-
-    value :
+    value
         list-like used as value text (in most cases identical with sizes argument)
-
-    loc :
-        The location of the texts (labels and/or values) inside the rectangles.
-
-        The strings
-        ``'upper left', 'upper right', 'lower left', 'lower right'``
-        place the text at the corresponding corner of the rectangles.
-
-        The strings
-        ``'upper center', 'lower center', 'center left', 'center right'``
-        place the text at the center of the corresponding edge of the
-        rectangles.
-
-        The string ``'center'`` places the text at the center of the rectangles.
-
-        ``NoneType`` defaults to ``'center'``.
-
-    ax :
+    ax
         Matplotlib Axes instance
-
-    pad :
+    pad
         draw rectangles with a small gap between them
-
     bar_kwargs : dict
         keyword arguments passed to matplotlib.Axes.bar
-
     text_kwargs : dict
         keyword arguments passed to matplotlib.Axes.text
-
     **kwargs
         Any additional kwargs are merged into `bar_kwargs`. Explicitly provided
         kwargs here will take precedence.
