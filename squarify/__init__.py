@@ -5,11 +5,6 @@
 
 # INTERNAL FUNCTIONS not meant to be used by the user
 
-import re
-
-_location_error_message = "Invalid location string: '%s'."
-
-
 def pad_rectangle(rect):
     if rect["dx"] > 2:
         rect["x"] += 1
@@ -312,9 +307,9 @@ def plot(
             va, ha = "center", "center"
         else:
             va, ha = loc.split()
-            if va not in {"top", "center", "bottom"}:
+            if va not in _v_offsets.keys():
                 raise ValueError(f"Invalid `loc` string: {loc}")
-            if ha not in {"left", "center", "right"}:
+            if ha not in _h_offsets.keys():
                 raise ValueError(f"Invalid `loc` string: {loc}")
 
         # Add the annot
