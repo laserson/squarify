@@ -16,4 +16,5 @@ setup(
         "Programming Language :: Python :: 3.6",
     ],
     url="https://github.com/laserson/squarify",
+    install_requires=["matplotlib"],
 )
