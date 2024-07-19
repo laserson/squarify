@@ -1,7 +1,7 @@
 squarify
 ========
 ![](https://img.shields.io/pypi/v/squarify.svg?style=flat)
-[![Build Status](https://travis-ci.org/laserson/squarify.svg?branch=master)](https://travis-ci.org/laserson/squarify)
+![](https://github.com/laserson/squarify/actions/workflows/python-package.yml/badge.svg)
 ![](https://img.shields.io/pypi/pyversions/squarify.svg?style=flat)
 ![](https://img.shields.io/pypi/l/squarify.svg?style=flat)
 
