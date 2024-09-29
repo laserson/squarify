@@ -1,5 +1,5 @@
-squarify
-========
+# squarify
+
 ![](https://img.shields.io/pypi/v/squarify.svg?style=flat)
 ![](https://github.com/laserson/squarify/actions/workflows/python-package.yml/badge.svg)
 ![](https://img.shields.io/pypi/pyversions/squarify.svg?style=flat)
@@ -12,39 +12,40 @@ implements it differently.
 
 ## Contents
 
-* [Installation](#Installation)
-* [Usage](#Usage)
-* [Example](#Example)
-* [Documentation](#Documentation-for-Squarify)
+- [Installation](#Installation)
+- [Usage](#Usage)
+- [Example](#Example)
+- [Documentation](#Documentation-for-Squarify)
 
-Installation
-------------
+<br><br>
+
+## Installation
 
 Compatible with Python 2 and Python 3.
 
     pip install squarify
 
+<br><br>
 
-Usage
------
+## Usage
 
 The main function is `squarify` and it requires two things:
 
-* A coordinate system comprising values for the origin (`x` and `y`) and the
-width/height (`dx` and `dy`).
-* A list of positive values sorted from largest to smallest and normalized to
-the total area, i.e., `dx * dy`).
+- A coordinate system comprising values for the origin (`x` and `y`) and the
+  width/height (`dx` and `dy`).
+- A list of positive values sorted from largest to smallest and normalized to
+  the total area, i.e., `dx * dy`).
 
 The function returns a list of `dict`s (i.e., JSON objects), each one a
 rectangle with coordinates corresponding to the given coordinate system and area
-proportional to the corresponding value.  Here's an example rectangle:
+proportional to the corresponding value. Here's an example rectangle:
 
 ```json
 {
-    "x": 0.0,
-    "y": 0.0,
-    "dx": 327.7,
-    "dy": 433.0
+  "x": 0.0,
+  "y": 0.0,
+  "dx": 327.7,
+  "dy": 433.0
 }
 ```
 
@@ -58,9 +59,10 @@ The helper function `normalize_sizes` will compute the normalized values, and
 the helper function `plot` will generate a Matplotlib-based treemap
 visualization of your data (see [documentation](#Documentation-for-Squarify)).
 
+<br><br>
 
-Example
--------
+## Example
+
 ```python
 import squarify
 
@@ -130,11 +132,12 @@ The variable `rects` contains
 ]
 ```
 
-Documentation for [Squarify](squarify/__init__.py)
----------
+<br><br>
+
+## Documentation for [Squarify](squarify/__init__.py)
 
 `normalize_sizes(sizes, dx, dy)`
-:   Normalize list of values.
+: Normalize list of values.
 
 Normalizes a list of numeric values so that `sum(sizes) == dx * dy`.
 
@@ -150,18 +153,18 @@ Normalizes a list of numeric values so that `sum(sizes) == dx * dy`.
     list[numeric]
         The normalized values.
 
-----------------------------------------------------------------------------------------
+<br><br>
 
 `padded_squarify(sizes, x, y, dx, dy)`
-:   Compute padded treemap rectangles.
+: Compute padded treemap rectangles.
 
 See `squarify` docstring for details. The only difference is that the
 returned rectangles have been "padded" to allow for a visible border.
 
-----------------------------------------------------------------------------------------
+<br><br>
 
 `plot(sizes, norm_x=100, norm_y=100, color=None, label=None, value=None, ax=None, pad=False, bar_kwargs=None, text_kwargs=None, **kwargs)`
-:   Plotting with Matplotlib.
+: Plotting with Matplotlib.
 
 **Parameters**
 
@@ -192,10 +195,10 @@ returned rectangles have been "padded" to allow for a visible border.
     matplotlib.axes.Axes
         Matplotlib Axes
 
-----------------------------------------------------------------------------------------
+<br><br>
 
 `squarify(sizes, x, y, dx, dy)`
-:   Compute treemap rectangles.
+: Compute treemap rectangles.
 
 Given a set of values, computes a treemap layout in the specified geometry
 using an algorithm based on Bruls, Huizing, van Wijk, "Squarified Treemaps".
