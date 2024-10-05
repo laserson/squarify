@@ -220,6 +220,7 @@ def plot(
     """
 
     import matplotlib.pyplot as plt
+    from matplotlib import cm
 
     if ax is None:
         ax = plt.gca()
@@ -228,7 +229,8 @@ def plot(
         import matplotlib.cm
         import random
 
-        cmap = matplotlib.cm.get_cmap()
+        # cmap = matplotlib.cm.get_cmap()
+        cmap = cm.get_cmap('hsv')  # or cm['hsv']
         color = [cmap(random.random()) for i in range(len(sizes))]
 
     if bar_kwargs is None:
