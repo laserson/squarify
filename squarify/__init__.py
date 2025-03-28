@@ -225,10 +225,9 @@ def plot(
         ax = plt.gca()
 
     if color is None:
-        import matplotlib.cm
         import random
 
-        cmap = matplotlib.cm.get_cmap()
+        cmap = plt.get_cmap()
         color = [cmap(random.random()) for i in range(len(sizes))]
 
     if bar_kwargs is None:
